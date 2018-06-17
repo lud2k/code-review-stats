@@ -1,0 +1,4 @@
+
+:local(.paper) .recharts-legend-wrapper {
+    bottom: -10px !important;
+}

@@ -1,0 +1,8 @@
+
+:local(.listItem) {
+    height: 20px;
+}
+
+:local(.checkbox) {
+    margin-left: -20px;
+}

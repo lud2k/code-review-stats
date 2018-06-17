@@ -1,0 +1,58 @@
+{
+  "name": "code-review-stats",
+  "version": "1.0.7",
+  "description": "Code Review Stats",
+  "homepage": "https://github.com/lud2k/code-review-stats",
+  "dependencies": {
+    "moment": "^2.20.1",
+    "commander": "^2.15.1",
+    "inquirer": "^6.0.0",
+    "node-fetch": "^2.1.2",
+    "lodash": "^4.17.4",
+    "progress": "^2.0.0",
+    "request": "^2.85.0"
+  },
+  "devDependencies": {
+    "@types/commander": "^2.12.2",
+    "@types/inquirer": "0.0.41",
+    "@types/node-fetch": "^2.1.1",
+    "@types/progress": "^2.0.1",
+    "@types/recharts": "^1.0.19",
+    "@types/d3": "^4.11.1",
+    "@types/lodash": "^4.14.86",
+    "@types/moment": "^2.13.0",
+    "@types/react": "^16.0.31",
+    "@types/react-dom": "^16.0.3",
+    "@types/react-router-dom": "^4.2.3",
+    "@types/redux": "^3.6.0",
+    "awesome-typescript-loader": "^3.2.1",
+    "css-loader": "^0.28.7",
+    "d3": "^4.12.0",
+    "material-ui": "^1.0.0-beta.26",
+    "material-ui-icons": "^1.0.0-beta.17",
+    "randomcolor": "^0.5.3",
+    "react": "^16.2.0",
+    "react-dom": "^16.2.0",
+    "react-router-dom": "^4.2.2",
+    "recharts": "^1.0.0-beta.10",
+    "redux": "^3.7.2",
+    "source-map-loader": "^0.2.1",
+    "style-loader": "^0.19.1",
+    "tslint": "^5.9.1",
+    "typescript": "^2.4.1",
+    "webpack": "^3.9.1",
+    "webpack-dev-server": "^2.9.7",
+    "webpack-node-externals": "^1.7.2"
+  },
+  "scripts": {
+    "build": "webpack",
+    "lint": "tslint -c tslint.json 'src/**/*.tsx' 'cli/**/*.ts'",
+    "watch": "webpack --watch",
+    "dev": "webpack-dev-server"
+  },
+  "bin": {
+    "code-review-stats": "build/main.js"
+  },
+  "author": "Ludovic Cabre",
+  "license": "ISC"
+}

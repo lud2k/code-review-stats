@@ -1,0 +1,8 @@
+
+:local(.tooltip) {
+    pointer-events: none;
+}
+
+:local(.svg) text {
+    pointer-events: none;
+}

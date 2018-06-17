@@ -1,0 +1,13 @@
+
+:local(.paper) {
+    font-size: 18px;
+    height: 100%;
+}
+
+:local(.content) {
+    padding: 20px;
+}
+
+:local(.paper) p {
+    margin: 5px 0;
+}

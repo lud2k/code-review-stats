@@ -1,0 +1,8 @@
+
+:local(.pie-chart) {
+    margin: 0 auto;
+}
+
+:local(.paper) {
+    min-height: 100%;
+}

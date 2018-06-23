@@ -89,8 +89,8 @@ const commander = __webpack_require__(2);
 const inquirer = __webpack_require__(3);
 const ProgressBar = __webpack_require__(4);
 const template_1 = __webpack_require__(5);
-const random_1 = __webpack_require__(7);
-const gerrit_1 = __webpack_require__(9);
+const random_1 = __webpack_require__(8);
+const gerrit_1 = __webpack_require__(10);
 const saveData = (data, options, config) => {
     const filename = Date.now();
     if (!options.js) {
@@ -203,11 +203,12 @@ module.exports = require("progress");
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const fs = __webpack_require__(6);
+const path = __webpack_require__(7);
 const createHtmlTemplate = (config, data, script) => `<!DOCTYPE html>
 <html>
   <head>
     <meta charset="UTF-8" />
-    <title>Score Board</title>
+    <title>Code Review Stats</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react/16.2.0/umd/react.production.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/16.2.0/umd/react-dom.production.min.js"></script>
   </head>
@@ -229,7 +230,7 @@ const createJsTemplate = (config, data) => `
 `;
 exports.createHtmlPage = (filename, config, data) => {
     const file = fs.openSync(filename, 'w');
-    const indexJs = fs.readFileSync('./build/index.js').toString();
+    const indexJs = fs.readFileSync(path.resolve(__dirname, 'index.js')).toString();
     fs.writeFileSync(file, createHtmlTemplate(JSON.stringify(config), JSON.stringify(data), indexJs));
 };
 exports.createJsScript = (filename, config, data) => {
@@ -246,6 +247,12 @@ module.exports = require("fs");
 
 /***/ }),
 /* 7 */
+/***/ (function(module, exports) {
+
+module.exports = require("path");
+
+/***/ }),
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -260,7 +267,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const moment = __webpack_require__(0);
-const _ = __webpack_require__(8);
+const _ = __webpack_require__(9);
 const USERS = ['Cordie', 'Priscilla', 'Myrna', 'Margarette', 'Delmar', 'Liliana', 'Philip',
     'Regine', 'Oma', 'Ashlee', 'Janette', 'Alvaro', 'Benito', 'Jenette', 'Flora', 'Scotty', 'Else',
     'Bryant', 'Treasa', 'Jacquiline'];
@@ -365,13 +372,13 @@ const generateRandomComments = (config, author, created, updated) => {
 
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports) {
 
 module.exports = require("lodash");
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -385,9 +392,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const node_fetch_1 = __webpack_require__(10);
+const node_fetch_1 = __webpack_require__(11);
 const moment = __webpack_require__(0);
-const parse_1 = __webpack_require__(11);
+const parse_1 = __webpack_require__(12);
 exports.fetchGerritData = (config, username, password, progressFn) => __awaiter(this, void 0, void 0, function* () {
     const response = yield exports.login(config.host, username, password);
     const setCookieHeader = response.headers.get('set-cookie');
@@ -474,13 +481,13 @@ exports.getData = (config, cookie, nbDays, progressFn) => __awaiter(this, void 0
 
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports) {
 
 module.exports = require("node-fetch");
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";

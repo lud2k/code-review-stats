@@ -54,6 +54,9 @@ const frontendConfig = {
 const cliConfig = {
     entry: './cli/main.ts',
     target: 'node',
+    node: {
+        __dirname: false,
+    },
     output: {
         path: __dirname + '/build',
         filename: 'main.js'

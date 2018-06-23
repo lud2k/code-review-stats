@@ -1,4 +1,5 @@
 import * as fs from 'fs'
+import * as path from 'path'
 import {Config} from './config'
 import {Data} from './backend/models'
 
@@ -30,7 +31,7 @@ const createJsTemplate = (config: string, data: string) => `
 
 export const createHtmlPage = (filename: string, config: Config, data: Data) => {
     const file = fs.openSync(filename, 'w')
-    const indexJs = fs.readFileSync('./build/index.js').toString()
+    const indexJs = fs.readFileSync(path.resolve(__dirname, 'index.js')).toString()
     fs.writeFileSync(file, createHtmlTemplate(JSON.stringify(config), JSON.stringify(data), indexJs))
 }
 

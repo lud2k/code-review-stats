@@ -1,6 +1,6 @@
 {
   "name": "code-review-stats",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "Code Review Stats",
   "homepage": "https://github.com/lud2k/code-review-stats",
   "dependencies": {

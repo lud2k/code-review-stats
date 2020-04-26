@@ -1,55 +1,58 @@
-import {
-    SET_CONFIG, SET_DATA, SET_FILTER, SetConfigAction, SetDataAction, SetFilterAction,
-} from './actions'
-import {createStore, Store} from 'redux'
-import {Filter, Stats} from '../model/models'
-import {computeStats} from '../core/stats'
-import {filterChanges} from '../core/filter'
-import {Config} from '../../cli/config'
-import {Change, Data} from '../../cli/backend/models'
+import { SET_FILTER, SetFilterAction } from './actions'
+import { createStore, Store } from 'redux'
+import { Filter, Stats } from '../model/models'
+import { Config } from '../../cli/config'
+import { Change, Data, UserMap } from '../../cli/backend/models'
+import { extractUsers } from '../core/users'
 
 export interface StoreState {
-    filter?: Filter
-    data?: Data
-    changes?: Change[]
-    filteredChanges?: Change[]
-    stats?: Stats
-    config?: Config
+  filter?: Filter
+  changes?: Change[]
+  users?: UserMap
+  config?: Config
 }
 
-export const reducer = (state: StoreState = {}, action: SetConfigAction & SetDataAction & SetFilterAction):
-    StoreState => {
+/**
+ * When dates are stringified they become strings. we need to convert them back to dates.
+ */
+const fixDates = (data: Data) => {
+  data.changes.forEach(change => {
+    change.updated = new Date(change.updated)
+    change.created = new Date(change.created)
+    change.reviews.forEach(review => {
+      review.date = new Date(review.date)
+      review.changeId = change.id
+    })
+    change.comments.forEach(comment => {
+      comment.date = new Date(comment.date)
+      comment.changeId = change.id
+    })
+  })
+  return data
+}
 
-    switch (action.type) {
-        case SET_CONFIG: {
-            return {
-                ...state,
-                config: action.config,
-            }
-        }
-        case SET_FILTER: {
-            const filteredChanges = state.changes ? filterChanges(action.filter, state.changes) : undefined
-            return {
-                ...state,
-                filteredChanges,
-                filter: action.filter,
-                stats: filteredChanges ? computeStats(filteredChanges) : undefined,
-            }
-        }
-        case SET_DATA: {
-            const changes = action.data.changes
-            const filteredChanges = filterChanges(state.filter, changes)
-            return {
-                ...state,
-                changes,
-                filteredChanges,
-                data: action.data,
-                stats: computeStats(filteredChanges),
-            }
-        }
-        default:
-            return state
+const root: any = window
+const rootData = fixDates(root.data)
+const DEFAULT_STATE: StoreState = {
+  changes: rootData.changes,
+  config: root.config,
+  filter: {
+    usernames: root.config.users,
+  },
+  users: extractUsers(rootData.changes),
+}
+
+export const reducer = (state: StoreState = DEFAULT_STATE, action: SetFilterAction): StoreState => {
+  switch (action.type) {
+    case SET_FILTER: {
+      return {
+        ...state,
+        filter: action.filter,
+      }
     }
+    default:
+      return state
+  }
 }
 
 export const store: Store<StoreState> = createStore(reducer)

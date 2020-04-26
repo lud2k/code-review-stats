@@ -1,0 +1,23 @@
+.table > thead > tr,
+.table > tbody > tr {
+  height: 32px;
+}
+
+.table > thead > tr > th,
+.table > tbody > tr > td {
+  padding: 5px 10px;
+}
+
+.table > thead > tr > th:first-child,
+.table > tbody > tr > td:first-child {
+
+}
+
+.table > thead > tr > th:last-child,
+.table > tbody > tr > td:last-child {
+  min-width: 100px;
+}
+
+.table > tbody > tr:nth-child(2n + 1) > td {
+  background: #f9f9f9;
+}

@@ -1,4 +1,3 @@
-
-:local(.paper) .recharts-legend-wrapper {
-    bottom: -10px !important;
+.paper :global(.recharts-legend-wrapper) {
+  bottom: -10px !important;
 }

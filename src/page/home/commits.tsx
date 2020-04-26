@@ -1,68 +1,128 @@
-
 import * as React from 'react'
-import {Stats} from '../../model/models'
-import {SortableTable, TableColumn} from '../common/sortable-table'
-import Typography from 'material-ui/Typography'
-import Paper from 'material-ui/Paper'
-import Grid from 'material-ui/Grid'
+import { Filter } from '../../model/models'
+import { SortableTable, TableColumn } from '../common/sortable-table'
+import { Typography, Paper, Grid } from '@material-ui/core'
 import * as moment from 'moment'
 import * as _ from 'lodash'
-import {Config} from '../../../cli/config'
+import * as styles from './commits.css'
+import { UsernameLink } from '../common/username-link'
+import { useChanges, useFilter } from '../../redux/seletors'
+import { Change } from '../../../cli/backend/models'
 
-const styles = require('./commits.css')
+const getData = (allChanges: Change[], filter: Filter): any[] => {
+  const changesPerUser: { string?: Change[] } = {}
+  for (const change of allChanges) {
+    if (filter.usernames.includes(change.owner.username)) {
+      if (!changesPerUser[change.owner.username]) {
+        changesPerUser[change.owner.username] = []
+      }
+      changesPerUser[change.owner.username].push(change)
+    }
+  }
 
-export class Commits extends React.Component<{ stats: Stats, config: Config }, {}> {
-    getData(): any[] {
-        const {stats} = this.props
-        return _.map(stats.users, (stat, username) => {
-            const timesInReview: number[] = stat.changes.map((change) =>
-                change.updated.getTime()-change.created.getTime())
-            const avgTimeInReview = timesInReview.length > 0 ? _.mean(timesInReview) : undefined
-            return {
-                name: username,
-                open: stat.changes.filter((change) => change.status === 'NEW').length,
-                merged: stat.changes.filter((change) => change.status === 'MERGED').length,
-                draft: stat.changes.filter((change) => change.status === 'DRAFT').length,
-                abandonned: stat.changes.filter((change) => change.status === 'ABANDONED').length,
-                comments: stat.receivedComments.length,
-                totalSize: stat.changes.reduce((prev, change) => (prev+change.insertions+change.deletions), 0),
-                avgSize: stat.changes.reduce((prev, change) => Math.max(prev, change.insertions+change.deletions), 0),
-                avgTimeInReview,
-            }
-        })
+  return filter.usernames.map(username => {
+    const changes: Change[] = changesPerUser[username]
+    if (!changes) {
+      return {
+        name: <UsernameLink username={username} />,
+        open: 0,
+        merged: 0,
+        draft: 0,
+        abandonned: 0,
+        comments: 0,
+        totalSize: 0,
+        avgSize: 0,
+        avgTimeInReview: undefined,
+      }
     }
 
-    renderRow = (entry: any, column: TableColumn) => {
-        if (column.key === 'avgTimeInReview') {
-            return entry.avgTimeInReview !== undefined ? moment.duration(entry.avgTimeInReview).humanize() : ''
+    const timesInReview: number[] = changes.map(
+      change => {
+        if (change.status === 'MERGED') {
+          return change.updated.getTime() - change.created.getTime()
         } else {
-            return entry[column.key]
+          return -1
         }
+      }
+    ).filter(time => time !== -1)
+    const receivedComments = changes.reduce(
+      (ret, change) =>
+        ret +
+        change.comments.filter(comment => comment.author.username !== change.owner.username).length,
+      0
+    )
+    const avgTimeInReview = timesInReview.length > 0 ? _.mean(timesInReview) : undefined
+    return {
+      name: username,
+      open: changes.filter(change => change.status === 'NEW').length,
+      merged: changes.filter(change => change.status === 'MERGED').length,
+      draft: changes.filter(change => change.status === 'DRAFT').length,
+      abandonned: changes.filter(change => change.status === 'ABANDONED').length,
+      comments: receivedComments,
+      totalSize: changes.reduce((prev, change) => {
+        if (change.status === 'MERGED') {
+          return prev + change.insertions + change.deletions
+        } else {
+          return prev
+        }
+      }, 0),
+      avgSize: changes.reduce(
+        (prev, change) => {
+          if (change.status === 'MERGED') {
+            return Math.max(prev, change.insertions + change.deletions)
+          } else {
+            return prev
+          }
+        },
+        0
+      ),
+      avgTimeInReview,
     }
+  })
+}
 
-    render() {
-        const data = this.getData()
-        const columns = [
-            { key: 'name', label: 'Name', numeric: false },
-            { key: 'open', label: 'Open', numeric: true },
-            { key: 'merged', label: 'Merged', numeric: true },
-            { key: 'draft', label: 'Draft', numeric: true },
-            { key: 'abandonned', label: 'Abandoned', numeric: true },
-            { key: 'comments', label: 'Comments Received', numeric: true },
-            { key: 'avgSize', label: 'Size (max)', numeric: true },
-            { key: 'totalSize', label: 'Size (total)', numeric: true },
-            { key: 'avgTimeInReview', label: 'Review Time (avg)', numeric: true },
-        ]
-        return (
-            <Grid item xs={12} sm={12}>
-                <Paper>
-                    <Typography type='title' color='inherit' style={{ padding: '20px' }}>
-                        Commits by user
-                    </Typography>
-                    <SortableTable defaultOrderBy={[false, 'name']} data={data} columns={columns} rowsPerPage={15}
-                                   rowRenderer={this.renderRow} className={styles.table} />
-                </Paper>
-            </Grid>
-        )
-    }
+const renderRow = (entry: any, column: TableColumn) => {
+  if (column.key === 'avgTimeInReview') {
+    return entry.avgTimeInReview !== undefined
+      ? moment.duration(entry.avgTimeInReview).humanize()
+      : ''
+  } else if (column.key === 'name') {
+    return <UsernameLink username={entry.name} />
+  } else {
+    return entry[column.key]
+  }
+}
+
+export const Commits: React.FunctionComponent = () => {
+  const changes = useChanges()
+  const filter = useFilter()
+  const data = getData(changes, filter)
+  const columns = [
+    { key: 'name', label: 'Name', numeric: false },
+    { key: 'open', label: 'Open', numeric: true },
+    { key: 'merged', label: 'Merged', numeric: true },
+    { key: 'draft', label: 'Draft', numeric: true },
+    { key: 'abandonned', label: 'Abandoned', numeric: true },
+    { key: 'comments', label: 'Comments Received', numeric: true },
+    { key: 'avgSize', label: 'Merged Size (max)', numeric: true },
+    { key: 'totalSize', label: 'Merged Size (total)', numeric: true },
+    { key: 'avgTimeInReview', label: 'Review Time (avg)', numeric: true },
+  ]
+  return (
+    <Grid item xs={12} sm={12}>
+      <Paper>
+        <Typography variant="h5" color="inherit" style={{ padding: '20px' }}>
+          Commits by user
+        </Typography>
+        <SortableTable
+          defaultOrderBy={[false, 'name']}
+          data={data}
+          columns={columns}
+          rowsPerPage={15}
+          rowRenderer={renderRow}
+          className={styles.table}
+        />
+      </Paper>
+    </Grid>
+  )
 }

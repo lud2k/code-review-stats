@@ -1,8 +1,7 @@
-
-:local(.listItem) {
-    height: 20px;
+.listItem {
+  height: 20px;
 }
 
-:local(.checkbox) {
-    margin-left: -20px;
+.checkbox {
+  margin-left: -20px;
 }

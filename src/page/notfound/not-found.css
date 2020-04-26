@@ -1,5 +1,4 @@
-
-:local(.not-found) {
+.notFound {
   position: absolute;
   top: 45%;
   right: 0;

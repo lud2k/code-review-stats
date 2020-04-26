@@ -1,34 +1,30 @@
-
 import * as React from 'react'
-import Typography from 'material-ui/Typography'
-import {Config} from '../../../cli/config'
+import { Typography } from '@material-ui/core'
+import { useConfig } from '../../redux/seletors'
 
-export class Title extends React.Component<{ config: Config, section?: string, subSection?: string}, {}> {
-    getTitle() {
-        const {config, section, subSection} = this.props
-        let title = config.title || 'Code Review Stats'
-        if (section) {
-            title += ` | ${section}`
-        }
-        if (subSection) {
-            title += ` | ${subSection}`
-        }
-        return title
-    }
+export const Title: React.FunctionComponent<{ section?: string; subSection?: string }> = ({
+  section,
+  subSection,
+}) => {
+  const config = useConfig()
+  const name = config.title || 'Code Review Stats'
 
-    componentDidMount() {
-        document.title = this.getTitle()
-    }
+  document.title = name
 
-    componentDidUpdate() {
-        document.title = this.getTitle()
-    }
+  const title = []
+  if (section) {
+    title.push(section)
+  }
+  if (subSection) {
+    title.push(subSection)
+  }
+  if (!title.length) {
+    title.push(name)
+  }
 
-    render() {
-        return (
-            <Typography type='title' color='inherit' style={{ flex: 1 }}>
-                {this.getTitle()}
-            </Typography>
-        )
-    }
+  return (
+    <Typography variant="h5" color="inherit" style={{ flex: 1 }}>
+      {title.join(' » ')}
+    </Typography>
+  )
 }
